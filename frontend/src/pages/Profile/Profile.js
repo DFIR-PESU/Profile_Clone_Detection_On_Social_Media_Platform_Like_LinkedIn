@@ -1,4 +1,4 @@
-import React,{ useState } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Profile.css'; // Import the CSS file
 
@@ -7,12 +7,14 @@ const Profile = () => {
     const navigate = useNavigate();
     const { user } = location.state || {}; // Access user data passed from login
     const [clones, setClones] = useState([]); // State to store clones
+
     // Handle user not present in state (e.g., direct access to profile route)
     if (!user) {
         // Optionally, redirect to login if user data is not found
         navigate('/login');
         return <p>Loading...</p>;
     }
+
     const handleLogout = async () => {
         try {
             const response = await fetch('http://localhost:5000/logout', { 
@@ -31,8 +33,8 @@ const Profile = () => {
         } catch (error) {
             console.error('Logout failed', error);
         }
-    
     };
+
     const handleFindClones = async () => {
         try {
             const response = await fetch('http://localhost:5000/find-clones', {
@@ -49,14 +51,20 @@ const Profile = () => {
             if (response.ok) {
                 console.log('Clones found:', data.result);
                 // Handle displaying clones here
-                // For example, you might want to set state to render the results
+                setClones(data.result); // Update state with the results
             } else {
                 console.error('Find clones failed:', data.message);
             }
         } catch (error) {
             console.error('Find clones failed', error);
-        }};
-    
+        }
+    };
+
+    // Filter out the user's own profile from the clones list
+    const filteredClones = clones.filter(
+        clone => clone.profile.username !== user.username
+    );
+
     return (
         <div className="profile-container">
             <div className="profile-header">
@@ -77,11 +85,13 @@ const Profile = () => {
             </div>
             <button className="logout-button" onClick={handleLogout}>Logout</button>
             <button className="find-clones-button" onClick={handleFindClones}>Find Clones</button>
+            
+            {/* Conditionally render clone results only after the button is clicked */}
             {clones.length > 0 && (
                 <div className="clones-list">
                     <h2>Clone Results</h2>
                     <ul>
-                        {clones.map((clone, index) => (
+                        {filteredClones.map((clone, index) => (
                             <li key={index}>
                                 <div>
                                     <h3>{clone.profile.name}</h3>
@@ -97,8 +107,7 @@ const Profile = () => {
                     </ul>
                 </div>
             )}
-            </div>
-       
+        </div>
     );
 };
 

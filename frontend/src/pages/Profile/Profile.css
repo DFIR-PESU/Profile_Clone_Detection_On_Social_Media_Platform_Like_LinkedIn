@@ -68,5 +68,21 @@
 }
 
 .logout-button:hover {
-    background-color: #005582;
+    background-color: #003e60;
+}
+
+.find-clones-button {
+    margin-top: 20px;
+    margin-left: 10px;
+    padding: 10px 15px;
+    background-color: #0073b1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.find-clones-button:hover {
+    background-color: #003e60;
 }
