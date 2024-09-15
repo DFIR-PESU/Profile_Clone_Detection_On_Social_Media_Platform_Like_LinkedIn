@@ -17,7 +17,7 @@ The main objective of this project is to identify cloned profiles on social netw
 ## Installation and Setup
 1. **Clone the Repository**
    ```
-   git clone https://github.com/Sadhika1012/SVM_511_565_577_615.git
+  [https://github.com/DFIR-PESU/Profile_Clone_Detection_And_Impact_Analysis_On_Social_Media_Platforms.git]
    ```
 2. **Frontend Setup (React.js)**
    - Navigate to the `frontend` directory.
