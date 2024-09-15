@@ -275,7 +275,8 @@ def compute_similarity_scores(source_profile, target_profiles):
     similarity_scores = []
     for target_profile in target_profiles:
         valid_attributes = [attr for attr in target_profile.keys() if pd.notna(target_profile[attr])]
-       
+        if 'username' in valid_attributes:
+            valid_attributes.remove('username')
         
         modified_source_sentence = concatenate_profile(source_profile, valid_attributes)
         modified_target_sentence = concatenate_profile(target_profile, valid_attributes)
