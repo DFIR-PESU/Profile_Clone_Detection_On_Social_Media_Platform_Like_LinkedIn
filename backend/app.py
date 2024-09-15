@@ -30,6 +30,12 @@ def connect_to_neo4j():
 # Function to fetch graph data from Neo4j
 # Function to fetch graph data from Neo4j
 def fetch_graph_data():
+    """
+    Fetches graph data from the Neo4j database by querying nodes and edges.
+
+    Returns:
+        dict: A dictionary containing nodes and edges extracted from the graph.
+    """
     with connect_to_neo4j().session() as session:
         
         result = session.run("MATCH (n1:N1)-[r]->(n2:N1) RETURN n1, r, n2")
@@ -58,6 +64,7 @@ def fetch_graph_data():
         return {'nodes': nodes, 'edges': edges}
     
 def add_hashed_password(session, element_id, password):
+
     # Hash the password
     hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     # Add or update the password attribute on the node
@@ -155,6 +162,15 @@ def logout():
 
 # Define function to hash passwords
 def hash_password(password):
+    """
+    Hashes the provided password using SHA-256.
+
+    Args:
+        password (str): The password to hash.
+
+    Returns:
+        str: The hashed password in hexadecimal format.
+    """
     return hashlib.sha256(password.encode()).hexdigest()
 
 @app.route('/login', methods=['POST'])
@@ -215,16 +231,47 @@ model = AutoModel.from_pretrained('sentence-transformers/all-mpnet-base-v2')
 
 # Function to concatenate profile values into a single string, considering only non-NaN attributes
 def concatenate_profile(profile, valid_attributes):
+    """
+    Concatenates non-NaN attributes of a profile into a single string.
+
+    Args:
+        profile (dict): The profile dictionary with attribute names and values.
+        valid_attributes (list): A list of valid attribute names to include in the concatenation.
+
+    Returns:
+        str: A concatenated string of the profile's non-NaN attributes.
+    """
     return " ".join([str(profile[attr]) for attr in valid_attributes if pd.notna(profile[attr])])
 
 # Mean Pooling - Take attention mask into account for correct averaging
 def mean_pooling(model_output, attention_mask):
+    """
+    Applies mean pooling on the token embeddings considering the attention mask.
+
+    Args:
+        model_output (torch.Tensor): The output from the transformer model (token embeddings).
+        attention_mask (torch.Tensor): The attention mask used during tokenization.
+
+    Returns:
+        torch.Tensor: The pooled sentence embedding.
+    """
     token_embeddings = model_output[0]
     input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
     return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
 # Function to compute cosine similarity between a source profile and a list of target profiles
 def compute_similarity_scores(source_profile, target_profiles):
+    """
+    Computes similarity scores between a source profile and a list of target profiles using 
+    cosine similarity and Levenshtein ratio.
+
+    Args:
+        source_profile (dict): The profile data of the source user.
+        target_profiles (list of dict): A list of target profiles for comparison.
+
+    Returns:
+        list: A list of similarity scores for each target profile.
+    """
     similarity_scores = []
     for target_profile in target_profiles:
         valid_attributes = [attr for attr in target_profile.keys() if pd.notna(target_profile[attr])]
