@@ -7,6 +7,7 @@ const Profile = () => {
     const navigate = useNavigate();
     const { user } = location.state || {}; // Access user data passed from login
     const [clones, setClones] = useState([]); // State to store clones
+    const [flaggedClones, setFlaggedClones] = useState([]); // To track flagged clones
 
     // Handle user not present in state (e.g., direct access to profile route)
     if (!user) {
@@ -62,8 +63,35 @@ const Profile = () => {
 
     // Filter out the user's own profile from the clones list
     const filteredClones = clones.filter(
-        clone => clone.profile.username !== user.username
+        clone => clone.profile.username !== user.username && clone.score > 0.7
     );
+
+    const handleFlagClone = async (clone) => {
+        try {
+            const response = await fetch('http://localhost:5000/flagged-clones', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    originalUsername: user.username,
+                    flaggedUsername: clone.profile.username,
+                }),
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Clone flagged successfully:', data);
+                // Mark the clone as flagged
+                setFlaggedClones([...flaggedClones, clone.profile.username]);
+            } else {
+                const errorData = await response.json();
+                console.error('Error flagging clone:', errorData.message);
+            }
+        } catch (error) {
+            console.error('Error flagging clone:', error);
+        }
+    };
 
     return (
         <div className="profile-container">
@@ -92,8 +120,8 @@ const Profile = () => {
                     <h2>Clone Results</h2>
                     <ul>
                         {filteredClones.map((clone, index) => (
-                            <li key={index}>
-                                <div>
+                            <li key={index} className="clone-item">
+                                <div className="clone-info">
                                     <h3>{clone.profile.name}</h3>
                                     <p><strong>Username:</strong> {clone.profile.username}</p>
                                     <p><strong>Position:</strong> {clone.profile.position}</p>
@@ -101,6 +129,13 @@ const Profile = () => {
                                     <p><strong>About:</strong> {clone.profile.about}</p>
                                     <p><strong>Education:</strong> {clone.profile.education}</p>
                                     <p><strong>Score:</strong> {clone.score.toFixed(2)}</p>
+                                    <button 
+                                        className="flag-button" 
+                                        onClick={() => handleFlagClone(clone)}
+                                        disabled={flaggedClones.includes(clone.profile.username)} // Disable after flagging
+                                    >
+                                        {flaggedClones.includes(clone.profile.username) ? 'Flagged' : 'Flag Clone'}
+                                    </button>
                                 </div>
                             </li>
                         ))}

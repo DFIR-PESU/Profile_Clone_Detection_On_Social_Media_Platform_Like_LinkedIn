@@ -86,3 +86,40 @@
 .find-clones-button:hover {
     background-color: #003e60;
 }
+
+.clones-list {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.clone-item {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.clone-item h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+.flag-button {
+    padding: 8px 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.flag-button:hover {
+    background-color: #c82333;
+}
