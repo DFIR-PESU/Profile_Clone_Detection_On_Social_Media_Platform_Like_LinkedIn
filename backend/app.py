@@ -277,6 +277,7 @@ def compute_similarity_scores(source_profile, target_profiles):
         valid_attributes = [attr for attr in target_profile.keys() if pd.notna(target_profile[attr])]
         if 'username' in valid_attributes:
             valid_attributes.remove('username')
+       
         
         modified_source_sentence = concatenate_profile(source_profile, valid_attributes)
         modified_target_sentence = concatenate_profile(target_profile, valid_attributes)
@@ -332,6 +333,40 @@ def find_clones():
     result = [{"profile": profile, "score": score} for profile, score in zip(target_profiles, similarity_scores)]
     
     return jsonify({"success": True, "result": result})
+
+
+# Endpoint to store flagged clone
+
+flagged_clones = []
+
+# Endpoint to store flagged clone
+@app.route('/flagged-clones', methods=['POST'])
+def flag_clone():
+    data = request.get_json()
+    print(data)
+    original_username = data.get('originalUsername')
+    flagged_username = data.get('flaggedUsername')
+
+    # Add the flagged clone to storage
+    flagged_clones.append({
+        'originalUsername': original_username,
+        'flaggedUsername': flagged_username
+    })
+
+    return jsonify({'message': 'Clone flagged successfully'}), 200
+
+# Endpoint to retrieve all flagged clones
+@app.route('/flagged-clones', methods=['GET'])
+def get_flagged_clones():
+    return jsonify(flagged_clones), 200
+
+# Endpoint to delete a flagged clone by username
+@app.route('/flagged-clones/<flagged_username>', methods=['DELETE'])
+def delete_flagged_clone(flagged_username):
+    global flagged_clones
+    flagged_clones = [clone for clone in flagged_clones if clone['flaggedUsername'] != flagged_username]
+    
+    return jsonify({'message': 'Clone deleted successfully'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
