@@ -298,75 +298,7 @@ def compute_similarity_scores(source_profile, target_profiles):
 
     return similarity_scores
 
-@app.route('/find-clones', methods=['POST'])
-def find_clones():
-    if not request.is_json:
-        return jsonify({"success": False, "message": "Content-Type must be application/json"}), 415
-    
-    data = request.get_json()
-    print('Received data:', data)  # Print received data for debugging
-    
-    if not data:
-        return jsonify({"success": False, "message": "Invalid JSON"}), 400
-    
-    # Clean user_profile to remove or replace NaN values
-    cleaned_profile = {k: (v if pd.notna(v) else '') for k, v in data.items()}
-    
-    # Read profiles from CSV
-    csv_file_path = 'newdataset3.csv'
-    df = pd.read_csv(csv_file_path)
-    
-    # Replace NaN values with empty strings in the DataFrame
-    df = df.fillna('')
-    
-    # Source profile
-    source_profile = cleaned_profile
-    print('Source Profile', source_profile)
-    
-    # List of target profiles (excluding the source profile)
-    target_profiles = df.to_dict(orient='records')
-    
-    # Compute similarity scores
-    similarity_scores = compute_similarity_scores(source_profile, target_profiles)
-    
-    # Include scores with profiles
-    result = [{"profile": profile, "score": score} for profile, score in zip(target_profiles, similarity_scores)]
-    
-    return jsonify({"success": True, "result": result})
 
-
-# Endpoint to store flagged clone
-
-flagged_clones = []
-
-# Endpoint to store flagged clone
-@app.route('/flagged-clones', methods=['POST'])
-def flag_clone():
-    data = request.get_json()
-    print(data)
-    original_username = data.get('originalUsername')
-    flagged_username = data.get('flaggedUsername')
-
-    # Add the flagged clone to storage
-    flagged_clones.append({
-        'originalUsername': original_username,
-        'flaggedUsername': flagged_username
-    })
-
-    return jsonify({'message': 'Clone flagged successfully'}), 200
-
-# Endpoint to retrieve all flagged clones
-@app.route('/flagged-clones', methods=['GET'])
-def get_flagged_clones():
-    return jsonify(flagged_clones), 200
-
-# Endpoint to delete a flagged clone by username
-@app.route('/flagged-clones/<flagged_username>', methods=['DELETE'])
-def delete_flagged_clone(flagged_username):
-    global flagged_clones
-    flagged_clones = [clone for clone in flagged_clones if clone['flaggedUsername'] != flagged_username]
-    
-    return jsonify({'message': 'Clone deleted successfully'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
