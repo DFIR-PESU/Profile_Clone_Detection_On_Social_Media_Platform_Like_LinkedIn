@@ -274,7 +274,10 @@ def compute_similarity_scores(source_profile, target_profiles):
     """
     similarity_scores = []
     for target_profile in target_profiles:
-        valid_attributes = [attr for attr in target_profile.keys() if pd.notna(target_profile[attr])]     
+        valid_attributes = [attr for attr in target_profile.keys() if pd.notna(target_profile[attr])]
+        if 'username' in valid_attributes:
+            valid_attributes.remove('username')
+       
         
         modified_source_sentence = concatenate_profile(source_profile, valid_attributes)
         modified_target_sentence = concatenate_profile(target_profile, valid_attributes)
@@ -294,6 +297,44 @@ def compute_similarity_scores(source_profile, target_profiles):
         similarity_scores.append(combined_similarity)
 
     return similarity_scores
+
+@app.route('/find-clones', methods=['POST'])
+def find_clones():
+    if not request.is_json:
+        return jsonify({"success": False, "message": "Content-Type must be application/json"}), 415
+    
+    data = request.get_json()
+    print('Received data:', data)  # Print received data for debugging
+    
+    if not data:
+        return jsonify({"success": False, "message": "Invalid JSON"}), 400
+    
+    # Clean user_profile to remove or replace NaN values
+    cleaned_profile = {k: (v if pd.notna(v) else '') for k, v in data.items()}
+    
+    # Read profiles from CSV
+    csv_file_path = 'newdataset3.csv'
+    df = pd.read_csv(csv_file_path)
+    
+    # Replace NaN values with empty strings in the DataFrame
+    df = df.fillna('')
+    
+    # Source profile
+    source_profile = cleaned_profile
+    print('Source Profile', source_profile)
+    
+    # List of target profiles (excluding the source profile)
+    target_profiles = df.to_dict(orient='records')
+    
+    # Compute similarity scores
+    similarity_scores = compute_similarity_scores(source_profile, target_profiles)
+    
+    # Include scores with profiles
+    result = [{"profile": profile, "score": score} for profile, score in zip(target_profiles, similarity_scores)]
+    
+    return jsonify({"success": True, "result": result})
+
+
 
 
 
