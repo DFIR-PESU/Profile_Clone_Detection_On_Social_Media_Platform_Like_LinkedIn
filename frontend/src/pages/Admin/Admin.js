@@ -16,7 +16,7 @@ const Admin = () => {
   return (
     <div className="container">
       <button className="button" onClick={handleViewGraph}>View Graph</button>
-      <button className="button" onClick={handleFlaggedClones}>Flagged Clones</button>
+      // <button className="button" onClick={handleFlaggedClones}>Flagged Clones</button>
     </div>
   );
 };
