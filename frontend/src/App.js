@@ -12,7 +12,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/graph" element={<Graph />} />
-      // <Route path="/flagged-clones" element={<FlaggedClones />}/>
+      {/* <Route path="/flagged-clones" element={<FlaggedClones />}/> */}
       </Routes>      
     </Router>
   );
